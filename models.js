@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var categorySchema = require('./category');
 var productSchema = require('./product');
+var userSchema = require('./user');
 var _ = require('underscore');
 
 module.exports = function(wagner){
@@ -8,7 +9,8 @@ module.exports = function(wagner){
 
   var models = {
     Category: mongoose.model('Category', categorySchema, 'categories'),
-    Product: mongoose.model('Product', productSchema, 'products')
+    Product: mongoose.model('Product', productSchema, 'products'),
+    User: mongoose.model('User', userSchema, 'users'),
   };
 
   _.each(models, function(value, key){

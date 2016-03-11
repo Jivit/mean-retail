@@ -1,8 +1,11 @@
 var express = require('express');
 var status = require('http-status');
+var bodyparser = require('body-parser');
 
 module.exports = function(wagner){
   var api = express.Router();
+
+  api.use(bodyparser.json());
 
   api.get('/category/id/:id', wagner.invoke(function(Category){
     return function(req, res){
@@ -43,6 +46,42 @@ module.exports = function(wagner){
     };
   }));
 
+  api.put('/me/cart', wagner.invoke(function(User){
+    return function(req, res){
+      try{
+        var cart = req.body.data.cart;
+      } catch(e) {
+        res.
+          status(status.BAD_REQUEST).
+          json({ error: 'No cart provided'});
+      }
+
+      req.user.data.cart = cart;
+      req.user.save(function(error, user){
+        if(error){
+          res.
+            status(status.INTERNAL_SERVER_ERROR).
+            json({ error: error.toString() });
+        }
+        res.json({ user: user });
+      });
+    };
+  }));
+
+  api.get('/me', wagner.invoke(function(User){
+    return function(req, res){
+      if(!req.user){
+        res.
+          status(status.UNAUTHORIZED).
+          json({ error: 'Not logged in'});
+      }
+      
+      req.user.populate(
+        { path: 'data.cart.product', model: 'Product' },
+        handleOne.bind(null, 'user', res));
+    };
+  }));
+
   return api;
 };
 
@@ -50,7 +89,7 @@ handleOne = function(property, res, error, doc){
   if(error){
     res.
       status(status.INTERNAL_SERVER_ERROR).
-      json({ error: error });
+      json({ error: error.toString() });
   }
   if(!doc){
     res.
@@ -67,7 +106,7 @@ handleMany = function(property, res, error, doc){
   if(error){
     res.
       status(status.INTERNAL_SERVER_ERROR).
-      json({ error: error });
+      json({ error: error.toString() });
   }
 
   var json = {};

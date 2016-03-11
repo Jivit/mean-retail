@@ -2,6 +2,7 @@ var assert = require('assert');
 var superagent = require('superagent');
 var express = require('express');
 var wagner = require('wagner-core');
+var status = require('http-status');
 
 var URL_ROOT = "http://localhost:3000";
 var PRODUCT_ID = '000000000000000000000001';
@@ -10,6 +11,7 @@ describe('Retail API', function(){
   var server;
   var Category;
   var Product;
+  var User;
 
   before(function(){
     var app = express();
@@ -18,6 +20,15 @@ describe('Retail API', function(){
     var models = require('./models')(wagner);
     Category = models.Category;
     Product = models.Product;
+    User = models.User;
+
+    app.use(function(req, res, next){
+      User.findOne({}, function(error, user){
+        assert.ifError(error);
+        req.user = user;
+        next();
+      });
+    });
 
     app.use(require('./api')(wagner));
 
@@ -34,7 +45,10 @@ describe('Retail API', function(){
       assert.ifError(error);
       Product.remove({}, function(error){
         assert.ifError(error);
-        done();
+        User.remove({}, function(error){
+          assert.ifError(error);
+          done();
+        });
       });
     });
   });
@@ -75,11 +89,27 @@ describe('Retail API', function(){
       }
     ];
 
+    var users = [
+      {
+        profile: {
+          username: 'gdangelo',
+          picture: 'http://gdangelo.fr/images/avatar.jpg'
+        },
+        data: {
+          oauth: 'invalid',
+          cart: []
+        }
+      }
+    ];
+
     Category.create(categories, function(error){
       assert.ifError(error);
       Product.create(products, function(error){
         assert.ifError(error);
-        done();
+        User.create(users, function(error){
+          assert.ifError(error);
+          done();
+        });
       });
     });
   });
@@ -165,4 +195,55 @@ describe('Retail API', function(){
        });
      });
    });
+
+   /*
+    * USER API
+    */
+    it('can save users cart', function(done){
+      var url = URL_ROOT + "/me/cart";
+      superagent.
+        put(url).
+        send({
+          data: {
+            cart: [{ product: PRODUCT_ID, quantity: 1 }]
+          }
+        }).
+        end(function(error, res){
+          assert.ifError(error);
+          assert.equal(res.status, status.OK);
+          User.findOne({}, function(error, user){
+            assert.ifError(error);
+            assert.equal(user.profile.username, 'gdangelo');
+            assert.equal(user.data.cart.length, 1);
+            assert.equal(user.data.cart[0].product, PRODUCT_ID);
+            assert.equal(user.data.cart[0].quantity, 1);
+            done();
+          });
+        });
+    });
+
+    it('can load users cart', function(done){
+      var url = URL_ROOT + '/me';
+      User.findOne({}, function(error, user){
+        assert.ifError(error);
+
+        user.data.cart = [{ product: PRODUCT_ID, quantity: 1 }];
+        user.save(function(error){
+          assert.ifError(error);
+
+          superagent.get(url, function(error, res){
+            assert.ifError(error);
+
+            var result;
+            assert.doesNotThrow(function(){
+              result = JSON.parse(res.text).user;
+            });
+            assert.equal(result.data.cart.length, 1);
+            assert.equal(result.data.cart[0].product._id, PRODUCT_ID);
+            assert.equal(result.data.cart[0].product.name, "Apple MacBook Pro 13''");
+            done();
+          });
+        });
+      });
+    });
 });

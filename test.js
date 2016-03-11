@@ -12,15 +12,19 @@ describe('Retail API', function(){
   var Category;
   var Product;
   var User;
+  var Stripe;
 
   before(function(){
     var app = express();
 
     // Make models available in tests
     var models = require('./models')(wagner);
+    var dependencies = require('./dependencies')(wagner);
+
     Category = models.Category;
     Product = models.Product;
     User = models.User;
+    Stripe = dependencies.Stripe;
 
     app.use(function(req, res, next){
       User.findOne({}, function(error, user){
@@ -171,6 +175,7 @@ describe('Retail API', function(){
 
    it('can load all products in category with sub-categories', function(done){
      var url = URL_ROOT + '/product/category/Electronics';
+
      superagent.get(url, function(error, res){
        assert.ifError(error);
        var result;
@@ -181,17 +186,18 @@ describe('Retail API', function(){
        assert.equal(result.products[0].name, "Apple MacBook Pro 13''");
        assert.equal(result.products[1].name, "OnePlus 2");
 
-       url = URL_ROOT + '/product/category/Electronics?price=1';
+       var url = URL_ROOT + '/product/category/Electronics?price=1';
        superagent.get(url, function(error, res){
          assert.ifError(error);
          var result;
          assert.doesNotThrow(function(){
            result = JSON.parse(res.text);
          });
+
          assert.equal(result.products.length, 2);
          assert.equal(result.products[0].name, "OnePlus 2");
          assert.equal(result.products[1].name, "Apple MacBook Pro 13''");
-         done();
+
        });
      });
    });
@@ -243,6 +249,51 @@ describe('Retail API', function(){
             assert.equal(result.data.cart[0].product.name, "Apple MacBook Pro 13''");
             done();
           });
+        });
+      });
+    });
+
+    it('can charge a user', function(done){
+      var url = URL_ROOT + "/checkout";
+      User.findOne({}, function(error, user){
+        assert.ifError(error);
+
+        user.data.cart = [{ product: PRODUCT_ID, quantity: 1 }];
+        user.save(function(error){
+          assert.ifError(error);
+
+          // Attempt to check out
+          superagent.
+            post(url).
+            send({
+              // Fake stripe credentials.
+              // In production, it should be an encrypted token.
+              stripeToken: {
+                number: '4242424242424242',
+                cvc: '123',
+                exp_month: '12',
+                exp_year: '2016'
+              }
+            }).
+            end(function(error, res){
+              assert.ifError(error);
+
+              assert.equal(res.status, status.OK);
+
+              var result;
+              assert.doesNotThrow(function(){
+                result = JSON.parse(res.text);
+              });
+
+              assert.ok(result.id);
+
+              Stripe.charges.retrieve(result.id, function(error, charge){
+                assert.ifError(error);
+                assert.ok(charge);
+                assert.equal(charge.amount, 1479 * 1.1 * 100); // 1479 EUR
+                done();
+              });
+            });
         });
       });
     });

@@ -42,7 +42,11 @@ function setupAuth(User, app){
   ));
 
   // Express middleware
-  app.use(require('express-session')({ secret: 'This is a secret!' }));
+  app.use(require('express-session')({
+    secret: 'This is a secret!',
+    resave: false,
+    saveUninitialized: false
+  }));
   app.use(passport.initialize());
   app.use(passport.session());
 

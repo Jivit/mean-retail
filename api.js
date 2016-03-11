@@ -1,6 +1,7 @@
 var express = require('express');
 var status = require('http-status');
 var bodyparser = require('body-parser');
+var _ = require('underscore');
 
 module.exports = function(wagner){
   var api = express.Router();
@@ -34,10 +35,10 @@ module.exports = function(wagner){
     return function(req, res){
       var sort = { name: 1 };
       if(req.query.price == "1"){
-        sort = { "internal.approximateUSD": 1 };
+        sort = { "internal.approximatePriceUSD": 1 };
       }
       else if(req.query.price == "-1"){
-        sort = { "internal.approximateUSD": -1 };
+        sort = { "internal.approximatePriceUSD": -1 };
       }
       Product.
         find({ "category.ancestors": req.params.id }).
@@ -51,7 +52,7 @@ module.exports = function(wagner){
       try{
         var cart = req.body.data.cart;
       } catch(e) {
-        res.
+        return res.
           status(status.BAD_REQUEST).
           json({ error: 'No cart provided'});
       }
@@ -59,7 +60,7 @@ module.exports = function(wagner){
       req.user.data.cart = cart;
       req.user.save(function(error, user){
         if(error){
-          res.
+          return res.
             status(status.INTERNAL_SERVER_ERROR).
             json({ error: error.toString() });
         }
@@ -71,14 +72,61 @@ module.exports = function(wagner){
   api.get('/me', wagner.invoke(function(User){
     return function(req, res){
       if(!req.user){
-        res.
+        return res.
           status(status.UNAUTHORIZED).
           json({ error: 'Not logged in'});
       }
-      
+
       req.user.populate(
         { path: 'data.cart.product', model: 'Product' },
         handleOne.bind(null, 'user', res));
+    };
+  }));
+
+  api.post('/checkout', wagner.invoke(function(User, Stripe){
+    return function(req, res){
+      if(!req.user){
+        return res.
+          status(status.UNAUTHORIZED).
+          json({ error: 'Not logged in' });
+      }
+
+      // Populate the products in the user's cart
+      req.user.populate({ path: 'data.cart.product', model: 'Product'}, function(error, user){
+        var totalUSD = 0;
+        // Sum up total user's cart price in USD
+        _.each(user.data.cart, function(item){
+          totalUSD += item.product.internal.approximatePriceUSD * item.quantity;
+        });
+
+        // Charge with Stripe
+        Stripe.charges.create(
+          {
+            amount: Math.ceil(totalUSD * 100),
+            currency: 'usd',
+            source: req.body.stripeToken,
+            description: 'Example charge'
+          },
+          function(err, charge){
+            if (err && err.type === 'StripeCardError') {
+              return res.
+                status(status.BAD_REQUEST).
+                json({ error: err.toString() });
+            }
+            if(err){
+              console.log(err);
+              return res.
+                status(status.INTERNAL_SERVER_ERROR).
+                json({ error: err.toString() });
+            }
+
+            req.user.data.cart = [];
+            req.user.save(function(){
+              // If successfull, return the charge id
+              return res.json({ id: charge.id });
+          });
+        });
+      });
     };
   }));
 
@@ -87,12 +135,12 @@ module.exports = function(wagner){
 
 handleOne = function(property, res, error, doc){
   if(error){
-    res.
+    return res.
       status(status.INTERNAL_SERVER_ERROR).
       json({ error: error.toString() });
   }
   if(!doc){
-    res.
+    return res.
       status(status.NOT_FOUND).
       json({ error: 'Not found'});
   }
@@ -104,7 +152,7 @@ handleOne = function(property, res, error, doc){
 
 handleMany = function(property, res, error, doc){
   if(error){
-    res.
+    return res.
       status(status.INTERNAL_SERVER_ERROR).
       json({ error: error.toString() });
   }

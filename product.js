@@ -5,7 +5,7 @@ var fx = require('./fx');
 var productSchema = {
   name: { type: String, required: true },
   // Pictures must start with "http://"
-  pictures: [{ type: String, match: /^http:\/\//i, require: true }],
+  pictures: [{ type: String, match: /^http:\/\//i }],
   price: {
     amount: {
       type: Number,
@@ -42,7 +42,7 @@ var currencySymbols = {
 }
 
 schema.virtual('displayPrice').get(function(){
-  return currencySymbols[this.proce.currency] + '' +
+  return currencySymbols[this.price.currency] + '' +
     this.price.amount;
 });
 

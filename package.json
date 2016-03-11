@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "watch": "gulp watch"
   },
   "repository": {
     "type": "git",
@@ -27,6 +27,15 @@
   "homepage": "https://github.com/gdangelo/mean-retail",
   "dependencies": {
     "express": "^4.13.4",
-    "mongoose": "^4.4.6"
+    "http-status": "^0.2.0",
+    "mongoose": "^4.4.6",
+    "underscore": "^1.8.3",
+    "wagner-core": "^0.2.0"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-mocha": "^2.2.0",
+    "mocha": "^2.4.5",
+    "superagent": "^1.8.0"
   }
 }

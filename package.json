@@ -1,0 +1,31 @@
+{
+  "name": "mean-retail",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gdangelo/mean-retail.git"
+  },
+  "keywords": [
+    "MEAN",
+    "MongoDB",
+    "Express.js",
+    "AngularJS",
+    "Node.js",
+    "Retail",
+    "JS"
+  ],
+  "author": "Grégory D'Angelo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gdangelo/mean-retail/issues"
+  },
+  "homepage": "https://github.com/gdangelo/mean-retail",
+  "dependencies": {
+    "mongoose": "^4.4.6"
+  }
+}

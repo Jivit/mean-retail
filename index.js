@@ -7,6 +7,8 @@ var app = express();
 
 app.set('port', process.env.PORT || 3000);
 
+wagner.invoke(require('./auth'), { app: app });
+
 app.use('/api/v1', require('./api')(wagner));
 
 app.listen(app.get('port'), function(){

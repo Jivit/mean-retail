@@ -35,7 +35,7 @@ var productSchema = {
 
 var schema = new mongoose.Schema(productSchema);
 
-var currencySymbols: {
+var currencySymbols = {
   "USD": "$",
   "EUR": "€",
   "GBP": "£"

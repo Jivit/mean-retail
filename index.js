@@ -1,4 +1,7 @@
 var express = require('express');
+
+require('./models')();
+
 var app = express();
 
 app.set('port', process.env.PORT || 3000);

@@ -20,7 +20,6 @@ function setupAuth(User, app){
     },
     function(accessToken, refreshToken, profile, done){
       if (!profile.emails || !profile.emails.length){
-        console.log(profile);
         return done('No emails asscociated with this account!');
       }
 

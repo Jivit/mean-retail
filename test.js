@@ -21,10 +21,19 @@ describe('Retail API', function(){
     var models = require('./models')(wagner);
     var dependencies = require('./dependencies')(wagner);
 
-    Category = models.Category;
-    Product = models.Product;
-    User = models.User;
-    Stripe = dependencies.Stripe;
+    var deps = wagner.invoke(function(Category, Product, User, Stripe){
+      return {
+        Category: Category,
+        Product: Product,
+        User: User,
+        Stripe: Stripe
+      }
+    });
+
+    Category = deps.Category;
+    Product = deps.Product;
+    User = deps.User;
+    Stripe = deps.Stripe;
 
     app.use(function(req, res, next){
       User.findOne({}, function(error, user){
@@ -71,7 +80,7 @@ describe('Retail API', function(){
         name: "Apple MacBook Pro 13''",
         price: {
           amount: 1479.00,
-          currency: "EUR"
+          currency: "USD"
         },
         category: { _id: 'Laptops', ancestors: ['Electronics', 'Laptops'] }
       },
@@ -79,7 +88,7 @@ describe('Retail API', function(){
         name: "OnePlus 2",
         price: {
           amount: 440.79,
-          currency: "EUR"
+          currency: "USD"
         },
         category: { _id: 'Cellphones', ancestors: ['Electronics', 'Cellphones'] }
       },
@@ -87,7 +96,7 @@ describe('Retail API', function(){
         name: "Elon Musk: Tesla, SpaceX, and the Quest for a Fantastic Future",
         price: {
           amount: 19.08,
-          currency: "EUR"
+          currency: "USD"
         },
         category: { _id: 'Books' }
       }
@@ -175,7 +184,6 @@ describe('Retail API', function(){
 
    it('can load all products in category with sub-categories', function(done){
      var url = URL_ROOT + '/product/category/Electronics';
-
      superagent.get(url, function(error, res){
        assert.ifError(error);
        var result;
@@ -197,7 +205,7 @@ describe('Retail API', function(){
          assert.equal(result.products.length, 2);
          assert.equal(result.products[0].name, "OnePlus 2");
          assert.equal(result.products[1].name, "Apple MacBook Pro 13''");
-
+         done();
        });
      });
    });
@@ -254,6 +262,8 @@ describe('Retail API', function(){
     });
 
     it('can charge a user', function(done){
+      this.timeout(10000);
+
       var url = URL_ROOT + "/checkout";
       User.findOne({}, function(error, user){
         assert.ifError(error);
@@ -290,7 +300,7 @@ describe('Retail API', function(){
               Stripe.charges.retrieve(result.id, function(error, charge){
                 assert.ifError(error);
                 assert.ok(charge);
-                assert.equal(charge.amount, 1479 * 1.1 * 100); // 1479 EUR
+                assert.equal(charge.amount, 1479 * 100); // 1479 USD
                 done();
               });
             });

@@ -210,6 +210,25 @@ describe('Retail API', function(){
      });
    });
 
+   it('can search product by text', function(done){
+     var url = URL_ROOT + '/product/text/Apple';
+     superagent.get(url, function(error, res){
+       assert.ifError(error);
+
+       assert.equal(res.status, status.OK);
+
+       var result;
+       assert.doesNotThrow(function(){
+         result = JSON.parse(res.text).products;
+       });
+
+       assert.equal(result.length, 1);
+       assert.equal(result[0]._id, PRODUCT_ID);
+       assert.equal(result[0].name, "Apple MacBook Pro 13''");
+       done();
+     });
+   });
+
    /*
     * USER API
     */

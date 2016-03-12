@@ -46,6 +46,8 @@ module.exports = function(db, fx){
       this.price.amount;
   });
 
+  schema.index({ name: 'text' });
+
   schema.set('toObject', { virtuals: true });
   schema.set('toJSON', { virtuals: true });
 

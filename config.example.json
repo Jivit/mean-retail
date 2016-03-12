@@ -1,0 +1,9 @@
+// source me before running the webserver
+// rename me config.json
+
+{
+  "facebookClientId": "TODO",
+  "facebookClientSecret": "TODO",
+  "stripeKey": "TODO",
+  "openExchangeRatesKey": "TODO"
+}

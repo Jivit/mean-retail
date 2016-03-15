@@ -1,3 +1,4 @@
+var path = require('path');
 var fs = require('fs');
 var Stripe = require('stripe');
 var fx = require('./fx');
@@ -10,6 +11,7 @@ module.exports = function(wagner){
   wagner.factory('fx', fx);
 
   wagner.factory('Config', function(){
-    return JSON.parse(fs.readFileSync('./config.json').toString());
+    var configFile = path.resolve(__dirname, 'config.json');
+    return JSON.parse(fs.readFileSync(configFile).toString());
   });
 };

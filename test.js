@@ -18,8 +18,8 @@ describe('Retail API', function(){
     var app = express();
 
     // Make models available in tests
-    var models = require('./models')(wagner);
-    var dependencies = require('./dependencies')(wagner);
+    var models = require('./app/models/models')(wagner);
+    var dependencies = require('./config/dependencies')(wagner);
 
     var deps = wagner.invoke(function(Category, Product, User, Stripe){
       return {
@@ -43,7 +43,7 @@ describe('Retail API', function(){
       });
     });
 
-    app.use(require('./api')(wagner));
+    app.use(require('./app/api')(wagner));
 
     server = app.listen(3000);
   });

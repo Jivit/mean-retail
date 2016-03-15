@@ -1,0 +1,33 @@
+{
+  "name": "mean-retail",
+  "description": "",
+  "main": "index.js",
+  "authors": [
+    "Grégory D'Angelo"
+  ],
+  "license": "ISC",
+  "keywords": [
+    "MEAN",
+    "MongoDB",
+    "Express.js",
+    "AngularJS",
+    "Node.js",
+    "Retail",
+    "JS"
+  ],
+  "homepage": "https://github.com/gdangelo/mean-retail",
+  "moduleType": [],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "^1.5.0",
+    "angular-route": "^1.5.0",
+    "font-awesome": "^4.5.0",
+    "bootstrap": "^3.3.6"
+  }
+}

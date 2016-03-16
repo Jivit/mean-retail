@@ -1,7 +1,14 @@
 var gulp = require('gulp');
 var mocha = require('gulp-mocha');
+var nodemon = require('gulp-nodemon')
 
-gulp.task('test', function(){
+// Nodemon task
+gulp.task('nodemon', function(){
+  nodemon({ script: 'server.js' });
+});
+
+// Run the server tests
+gulp.task('test:server', function(){
   gulp.
     src('./test.js').
     pipe(mocha()).
@@ -10,6 +17,10 @@ gulp.task('test', function(){
     });
 });
 
-gulp.task('watch', function(){
-  gulp.watch(['./*.js', './config/**/*.js', './app/**/*.js'], ['test']);
+// Watch all server files for changes & run server tests (test:server) task on changes
+gulp.task('watch:server', function(){
+  gulp.watch(['./*.js', './config/**/*.js', './app/**/*.js'], ['test:server']);
 });
+
+// Run the server
+gulp.task('default', ['nodemon']);

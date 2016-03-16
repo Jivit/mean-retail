@@ -1,0 +1,17 @@
+<div class="nav-bar">
+  <div class="nav-bar-contents">
+    <div class="title">
+      MEAN Retail
+    </div>
+    <div class="user-info">
+      <div class="user" ng-show="user.user">
+        <img ng-src="{{user.user.profile.picture}}" />
+      </div>
+      <div class="login" ng-show="!user.user">
+        <a href="/auth/facebook">
+          <img src="//i.stack.imgur.com/LKMP7.png">
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

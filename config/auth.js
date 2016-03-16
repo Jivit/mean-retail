@@ -28,7 +28,7 @@ function setupAuth(User, Config, app){
         {
           $set: {
             'profile.username': profile.emails[0].value,
-            'profile.picture': 'http://graph.facebook.com' +
+            'profile.picture': 'http://graph.facebook.com/' +
               profile.id.toString() + '/picture?type=large'
           }
         },
@@ -51,13 +51,24 @@ function setupAuth(User, Config, app){
 
   // Express routes for auth
   app.get('/auth/facebook',
-    passport.authenticate('facebook', { scope: ['email'] })
-  );
+    function(req, res, next) {
+      var redirect = encodeURIComponent(req.query.redirect || '/');
+
+      passport.authenticate('facebook',
+        {
+          scope: ['email'],
+          callbackURL: 'http://localhost:3000/auth/facebook/callback?redirect=' + redirect
+        })(req, res, next);
+    });
 
   app.get('/auth/facebook/callback',
-    passport.authenticate('facebook', { failureRedirect: '/fail' }),
-    function(req, res){
-      res.send('Welcome ' + req.user.profile.username);
+    function(req, res, next) {
+      var url = 'http://localhost:3000/auth/facebook/callback?redirect=' +
+        encodeURIComponent(req.query.redirect);
+      passport.authenticate('facebook', { callbackURL: url })(req, res, next);
+    },
+    function(req, res) {
+      res.redirect(req.query.redirect);
     });
 }
 

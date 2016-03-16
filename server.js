@@ -16,7 +16,7 @@ app.use('/api/v1', require('./app/api')(wagner));
 
 // frontend routes
 app.get('*', function(req, res){
-  res.sendFile('./public/index.html');
+  res.sendFile(__dirname + './public/index.html');
 });
 
 app.listen(app.get('port'), function(){

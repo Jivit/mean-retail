@@ -17,4 +17,14 @@ _.each(services, function(service, name){
   components.factory(name, service);
 });
 
-var app = angular.module('mean-retail', ['mean-retail.components'])
+var app = angular.module('mean-retail', ['mean-retail.components', 'ngRoute']);
+
+app.config(function($routeProvider){
+  $routeProvider.
+    when('/product/:id', {
+      template: '<product-details></product-details>'
+    }).
+    otherwise({
+      redirectTo: '/'
+    });
+});

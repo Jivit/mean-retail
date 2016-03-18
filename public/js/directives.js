@@ -5,3 +5,10 @@ exports.userMenu = function(){
     templateUrl: './views/user-menu.html'
   };
 };
+
+exports.productDetails = function(){
+  return {
+    controller: 'ProductDetailsController',
+    templateUrl: './views/product-details.html'
+  };
+};

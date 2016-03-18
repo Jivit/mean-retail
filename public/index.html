@@ -14,12 +14,15 @@
 
     <!-- JS -->
     <script src="vendors/angular/angular.min.js"></script>
+    <script src="vendors/angular-route/angular-route.min.js"></script>
     <script src="bin/app.js"></script>
   </head>
 
   <body ng-app="mean-retail">
 
     <user-menu></user-menu>
+
+    <div class="content-wrapper" ng-view></div>
 
   </body>
 

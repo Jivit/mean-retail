@@ -2,10 +2,12 @@
   "name": "mean-retail",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
+    "postinstall": "bower install && gulp browserify",
     "watch": "gulp watch:server watch:client",
-    "start": "gulp"
+    "start:dev": "gulp",
+    "start": "node server.js"
   },
   "repository": {
     "type": "git",
@@ -45,5 +47,8 @@
     "gulp-nodemon": "^2.0.6",
     "mocha": "^2.4.5",
     "superagent": "^1.8.0"
+  },
+  "engines": {
+    "node": "5.5.0"
   }
 }

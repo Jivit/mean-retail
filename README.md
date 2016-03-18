@@ -14,8 +14,8 @@ This application is built with REST API, a desktop web client using AngularJS, a
 * [Express](http://expressjs.com/) to build the REST API;
 * [Node.js](https://nodejs.org/en/);
 * [Passport](http://passportjs.org/) to handle authentification for node.js;
-* [Gulp](http://passportjs.org/) to define and automate tasks;
-* [Mocha](http://passportjs.org/) as the test framework for the server part;
+* [Gulp](http://gulpjs.com/) to define and automate tasks;
+* [Mocha](https://mochajs.org/) as the test framework for the server part;
 
 ## Usage
 

@@ -21,6 +21,9 @@ var app = angular.module('mean-retail', ['mean-retail.components', 'ngRoute']);
 
 app.config(function($routeProvider){
   $routeProvider.
+    when('/category/:id', {
+      templateUrl: '../views/category-view.html'
+    }).
     when('/product/:id', {
       template: '<product-details></product-details>'
     }).
